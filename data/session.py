@@ -1,18 +1,21 @@
+from .bank_handler import Bank
+
+
 class Session:
 	__slots__ = [
-		'_bank_db',
+		'_bank',
 		'_current_client_id',
 	]
 
-	def __init__(self, bank_db):
-		self._bank_db = bank_db
+	def __init__(self, bank: Bank):
+		self._bank = bank
 		self._current_client_id = None
 
 	@property
 	def client(self):
 		if not self.has_session:
 			return None
-		return self._bank_db.clients[self._current_client_id]
+		return self._bank.get_client(self._current_client_id)
 
 	@property
 	def current_client_id(self):
@@ -22,16 +25,16 @@ class Session:
 	def has_session(self):
 		return bool(self._current_client_id)
 
-	def login(self, client_id, password):
-		if not client_id in self._bank_db.clients:
+	def login(self, cpf, password):
+		client = self._bank.get_client(cpf)
+
+		if not client:
 			return False
 
-		client = self._bank_db.clients[client_id]
-
-		if not password == client.password:
+		if not (password == client.password):
 			return False
 
-		self._current_client_id = client_id
+		self._current_client_id = client.id
 		return True
 
 	def logout(self):
