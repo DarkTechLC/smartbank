@@ -1,7 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMessageBox
 
-from data import bank_db, session_manager
+from data import bank, session_manager
 
 
 class WithdrawWindow:
@@ -34,9 +34,9 @@ class WithdrawWindow:
 			QMessageBox.warning(self._window, 'Erro ao sacar', 'Informe o valor do saque!')
 			return
 
-		account = bank_db.get_client_account(session_manager.client.cpf)
+		account = bank.get_client_account(session_manager.current_client_id)
 
-		if not bank_db.withdraw(amount, account.code):
+		if not bank.withdraw(amount, account.code):
 			QMessageBox.warning(self._window, 'Erro ao sacar', 'Saldo insuficiente, ou o valor informado foi menor ou igual a zero!')
 			return
 

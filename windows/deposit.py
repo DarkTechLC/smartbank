@@ -1,7 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMessageBox
 
-from data import bank_db, session_manager
+from data import bank, session_manager
 
 
 class DepositWindow:
@@ -34,9 +34,9 @@ class DepositWindow:
 			QMessageBox.warning(self._window, 'Erro ao depositar', 'Informe o valor do depósito!')
 			return
 
-		account = bank_db.get_client_account(session_manager.client.cpf)
+		account = bank.get_client_account(session_manager.current_client_id)
 
-		if not bank_db.deposit(amount, account.code):
+		if not bank.deposit(amount, account.code):
 			QMessageBox.warning(self._window, 'Erro ao depositar', 'O valor do depósito não pode ser menor ou igual a zero!')
 			return
 

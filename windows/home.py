@@ -1,7 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QTableWidgetItem
 
-from data import bank_db, session_manager
+from data import bank, session_manager
 
 
 class HomeWindow:
@@ -28,7 +28,7 @@ class HomeWindow:
 		return self._window
 	
 	def load_initial_state(self):
-		account = bank_db.get_client_account(session_manager.client.cpf)
+		account = bank.get_client_account(session_manager.current_client_id)
 
 		self._account_code_label.setText(f'Conta: {account.code}')
 		self._welcome_label.setText(f'Olá, {session_manager.client.name}!')
@@ -44,14 +44,14 @@ class HomeWindow:
 
 	def _load_history_table(self):
 		self._clear_history_table()
-		account = bank_db.get_client_account(session_manager.client.cpf)
+		history = bank.get_client_history(session_manager.current_client_id)
 
-		for history in account.history.logs:
+		for log in reversed(history):
 			row_position = self._history_table.rowCount()
 			self._history_table.insertRow(row_position)
-			self._history_table.setItem(row_position, 0, QTableWidgetItem(history['type']))
-			self._history_table.setItem(row_position, 1, QTableWidgetItem(history['timestamp'].strftime('%d/%m/%Y %H:%M:%S')))
-			self._history_table.setItem(row_position, 2, QTableWidgetItem(history['message']))
+			self._history_table.setItem(row_position, 0, QTableWidgetItem(log.type))
+			self._history_table.setItem(row_position, 1, QTableWidgetItem(log.timestamp.strftime('%d/%m/%Y %H:%M:%S')))
+			self._history_table.setItem(row_position, 2, QTableWidgetItem(log.message))
 		
 		self._history_table.resizeColumnsToContents()
 		self._history_table.resizeRowsToContents()

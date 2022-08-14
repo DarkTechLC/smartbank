@@ -1,7 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMessageBox
 
-from data import bank_db, Client, session_manager
+from data import bank, session_manager
 
 
 class RegisterWindow:
@@ -38,9 +38,7 @@ class RegisterWindow:
 			QMessageBox.warning(self._window, 'Erro ao cadastrar', 'Preencha todos os campos para cadastrar-se!')
 			return
 
-		client = Client(name, cpf, password)
-
-		if not bank_db.register_client(client):
+		if not bank.register_client(name, cpf, password):
 			QMessageBox.warning(self._window, 'Erro ao cadastrar', 'Esse CPF já está cadastrado!')
 			return
 

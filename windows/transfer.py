@@ -1,7 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMessageBox
 
-from data import bank_db, session_manager
+from data import bank, session_manager
 
 
 class TransferWindow:
@@ -36,13 +36,13 @@ class TransferWindow:
 			QMessageBox.warning(self._window, 'Erro ao transferir', 'Informe o valor da transferência!')
 			return
 
-		origin_account = bank_db.get_client_account(session_manager.client.cpf)
+		origin_account = bank.get_client_account(session_manager.current_client_id)
 
 		if destination_account_code == origin_account.code:
 			QMessageBox.warning(self._window, 'Erro ao transferir', 'Não é permitido transferir para sua conta!')
 			return
 
-		if not bank_db.transfer(amount, origin_account.code, destination_account_code):
+		if not bank.transfer(amount, origin_account.code, destination_account_code):
 			QMessageBox.warning(self._window, 'Erro ao transferir', 'Conta de destino inexistente, saldo insuficiente, ou o valor informado foi menor ou igual a zero!')
 			return
 
