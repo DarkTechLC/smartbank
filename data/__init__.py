@@ -1,6 +1,6 @@
-from .client import Client
-from .bank import Bank
+from .bank_handler import Bank
 from .session import Session
 
-bank_db = Bank()
-session_manager = Session(bank_db) 
+
+bank = Bank()
+session_manager = Session(bank)
