@@ -1,3 +1,4 @@
+from lib.crypt import Crypt
 from .bank_handler import Bank
 
 
@@ -31,7 +32,7 @@ class Session:
 		if not client:
 			return False
 
-		if not (password == client.password):
+		if not Crypt.compare(password, client.password):
 			return False
 
 		self._current_client_id = client.id

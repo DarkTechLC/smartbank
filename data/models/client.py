@@ -1,3 +1,4 @@
+from lib.crypt import Crypt
 from data.db import bank_db
 from .account import Account
 
@@ -50,9 +51,10 @@ class Client:
         data = {
             'name': self._name,
             'cpf': self._cpf,
-            'password': self._password,
+            'password': Crypt.hash(self._password),
         }
 
+        # TODO: update hashed password only when it changes
         if bool(self._id) and Client.get(self._id):
             result = bank_db.update(Client.table_name, 'id=%s', data, [self._id])
             return bool(result)
@@ -70,7 +72,7 @@ class Client:
 			id SERIAL PRIMARY KEY,
             name VARCHAR(150) NOT NULL,
             cpf VARCHAR(11) NOT NULL UNIQUE,
-            password VARCHAR(30) NOT NULL
+            password VARCHAR(100) NOT NULL
         ''')
 
     @staticmethod
