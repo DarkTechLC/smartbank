@@ -1,7 +1,8 @@
+from datetime import datetime
 from PyQt5 import uic
 from PyQt5.QtWidgets import QTableWidgetItem
 
-from data import bank, session_manager
+from data import bank
 
 
 class HomeWindow:
@@ -28,30 +29,33 @@ class HomeWindow:
 		return self._window
 	
 	def load_initial_state(self):
-		account = bank.get_client_account(session_manager.current_client_id)
+		client = bank.get_client()
+		balance = f"R$ {float(client['account']['balance']):.2f}".replace('.', ',')
 
-		self._account_code_label.setText(f'Conta: {account.code}')
-		self._welcome_label.setText(f'Olá, {session_manager.client.name}!')
-		self._balance_value_label.setText(account.balance_fmt)
+		self._account_code_label.setText(f"Conta: {client['account']['code']}")
+		self._welcome_label.setText(f"Olá, {client['name']}!")
+		self._balance_value_label.setText(balance)
 		self._load_history_table()
 
 	def _load_events(self):
 		self._withdraw_btn.clicked.connect(self._navigator.go_to_withdraw_window)
 		self._deposit_btn.clicked.connect(self._navigator.go_to_deposit_window)
 		self._transfer_btn.clicked.connect(self._navigator.go_to_transfer_window)
-		self._update_history_btn.clicked.connect(lambda: self._load_history_table())
+		self._update_history_btn.clicked.connect(lambda: self.load_initial_state())
 		self._logout_btn.clicked.connect(lambda: self._logout())
 
 	def _load_history_table(self):
 		self._clear_history_table()
-		history = bank.get_client_history(session_manager.current_client_id)
+		history = bank.get_client_history()
 
 		for log in reversed(history):
+			date_time = datetime.fromisoformat(log['timestamp']).strftime('%d/%m/%Y %H:%M:%S')
 			row_position = self._history_table.rowCount()
+
 			self._history_table.insertRow(row_position)
-			self._history_table.setItem(row_position, 0, QTableWidgetItem(log.type))
-			self._history_table.setItem(row_position, 1, QTableWidgetItem(log.timestamp.strftime('%d/%m/%Y %H:%M:%S')))
-			self._history_table.setItem(row_position, 2, QTableWidgetItem(log.message))
+			self._history_table.setItem(row_position, 0, QTableWidgetItem(log['type']))
+			self._history_table.setItem(row_position, 1, QTableWidgetItem(date_time))
+			self._history_table.setItem(row_position, 2, QTableWidgetItem(log['message']))
 		
 		self._history_table.resizeColumnsToContents()
 		self._history_table.resizeRowsToContents()
@@ -60,7 +64,7 @@ class HomeWindow:
 		self._history_table.setRowCount(0)
 
 	def _logout(self):
-		session_manager.logout()
+		bank.logout_client()
 		self._navigator.go_to_login_window()
 
 	def close(self):

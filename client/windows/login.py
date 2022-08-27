@@ -1,7 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMessageBox
 
-from data import session_manager
+from data import bank
 
 
 class LoginWindow:
@@ -36,7 +36,7 @@ class LoginWindow:
 			QMessageBox.warning(self._window, 'Erro ao entrar', 'Preencha todos os campos para entrar!')
 			return
 
-		if not session_manager.login(cpf, password):
+		if not bank.login_client(cpf, password):
 			QMessageBox.warning(self._window, 'Erro ao cadastrar', 'Credenciais inválidas: CPF e/ou senha incorretos!')
 			return
 		

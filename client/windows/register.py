@@ -1,7 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMessageBox
 
-from data import bank, session_manager
+from data import bank
 
 
 class RegisterWindow:
@@ -42,7 +42,6 @@ class RegisterWindow:
 			QMessageBox.warning(self._window, 'Erro ao cadastrar', 'Esse CPF já está cadastrado!')
 			return
 
-		session_manager.login(cpf, password)
 		self._clear_form()
 		self._navigator.go_to_home_window()
 

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QStackedLayout
 
 from windows import *
-from data import session_manager
+from data import bank
 
 
 class Navigator(QMainWindow):
@@ -28,7 +28,7 @@ class Navigator(QMainWindow):
 		if len(self._window_controllers) <= 0 or 0 > window_id >= len(self._window_controllers):
 			return
 
-		if private and not session_manager.has_session:
+		if private and not bank.session.has_session:
 			self.go_to_login_window()
 			return
 		

@@ -14,15 +14,14 @@ class Bank:
         client = Client(name, cpf, password)
 
         if not client.save():
-            return False
+            return None
         
         account = Account(client.id)
-
-        if not account.save():
-            return False
+        account.save()
 
         log = History('ABERTURA DA CONTA', f'Saldo inicial: {Account.format_money(account.balance)}', account.id)
-        return log.save()
+        log.save()
+        return client
     
     # def delete_client(self, client_id):
     #     pass
