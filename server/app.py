@@ -4,7 +4,22 @@ from data import bank, session_manager
 
 
 class AppController:
+    '''Controlador que processa as requisições dos usuários do SmartBank.
+
+    Methods
+    -------
+    close()
+		Fecha a conexão com o banco de dados
+	'''
     def __init__(self, request, response):
+        '''
+        Parameters
+        ----------
+        request : str
+			Dados da requisição do cliente
+        response : function
+            Função que envia a resposta da requisição para o cliente
+        '''
         self._request = request
         self._response = response
         self._data = Json.parse_from_json(self._request)
@@ -50,6 +65,9 @@ class AppController:
         self._middlewares()
 
     def _middlewares(self):
+        '''Aplica testes de validação e autorização antes de executar a ação
+        solicitada pelo cliente.
+        '''
         if not self._data:
             return self.send({'error': True, 'message': 'Não foi possível ler a requisição.'})
 
@@ -67,9 +85,22 @@ class AppController:
         return action['handler']()
 
     def send(self, content):
+        '''Método que simplifica o envio de uma resposta no formato JSON para o
+        cliente.
+
+        Parameters
+        ----------
+        content : dict
+            Conteúdo da resposta no formato de dicionário do Python
+        '''
         return self._response(Json.parse_to_json(content) or '{"error": true, "message": "Erro no servidor."}')
 
     def _register_client(self):
+        '''Manipulador da ação de registar cliente/usuário na aplicação.
+
+        Verifica se os dados para cadastro são válidos e salva no banco de dados.
+        No retorno é enviado um token que indica a sessão do usuário.
+        '''
         name = self._data['name']
         cpf = self._data['cpf']
         password = self._data['password']
@@ -83,11 +114,19 @@ class AppController:
         return self.send({'error': False, 'message': 'Usuário cadastrado com sucesso.', 'token': token})
 
     def _client_is_logged(self):
+        '''Manipulador da ação para verificar se o usuário tem um token de
+        sessão válido.
+        '''
         token = self._data['token'] if 'token' in self._data else None
         is_logged = token and session_manager.check(token)
         return self.send({'error': False, 'is_logged': is_logged})
 
     def _login_client(self):
+        '''Manipulador da ação de realizar login do cliente/usuário na aplicação.
+
+        Verifica se as credenciais são válida e então envia um token que indica
+        a sessão do usuário.
+        '''
         cpf = self._data['cpf']
         password = self._data['password']
 
@@ -99,11 +138,16 @@ class AppController:
         return self.send({'error': False, 'message': 'Acesso liberado com sucesso.', 'token': token})
 
     def _logout_client(self):
+        '''Manipulador da ação de destruir a sessão do usuário na aplicação.
+        '''
         token = self._data['token']
         session_manager.logout(token)
         return self.send({'error': False, 'message': 'Sessão destruída com sucesso.'})
 
     def _get_client(self):
+        '''Manipulador da ação de obter as informações referentes ao usuário que
+        está autenticado.
+        '''
         token = self._data['token']
         client_id = session_manager.get_id_by_token(token)
         client = bank.get_client(client_id)
@@ -125,6 +169,9 @@ class AppController:
         })
 
     def _get_client_history(self):
+        '''Manipulador da ação de obter o histórico de transações referentes ao
+        usuário que está autenticado.
+        '''
         token = self._data['token']
         client_id = session_manager.get_id_by_token(token)
         client = bank.get_client(client_id)
@@ -145,6 +192,9 @@ class AppController:
         })
 
     def _withdraw(self):
+        '''Manipulador da ação de realizar saque na conta do usuário que está
+        autenticado.
+        '''
         token = self._data['token']
         amount = self._data['amount']
         
@@ -159,6 +209,9 @@ class AppController:
         return self.send({'error': False, 'message': 'Saque realizado.'})
 
     def _deposit(self):
+        '''Manipulador da ação de realizar depósito na conta do usuário que está
+        autenticado.
+        '''
         token = self._data['token']
         amount = self._data['amount']
         
@@ -173,6 +226,9 @@ class AppController:
         return self.send({'error': False, 'message': 'Depósito realizado.'})
 
     def _transfer(self):
+        '''Manipulador da ação de realizar transferência a partir conta do
+        usuário que está autenticado.
+        '''
         token = self._data['token']
         amount = self._data['amount']
         destination_acc_code = self._data['destination_acc_code']
