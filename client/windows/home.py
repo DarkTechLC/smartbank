@@ -6,7 +6,28 @@ from data import bank
 
 
 class HomeWindow:
+	'''Janela de principal.
+
+	Attributes
+    ----------
+	window : QMainWindow
+		Elemento da janela atual
+
+    Methods
+    -------
+	load_initial_state()
+		Carrega o estado inicial da aplicação
+	close()
+		Fecha a janela atual
+	'''
+
 	def __init__(self, navigator):
+		'''
+		Parameters
+        ----------
+		navigator : Navigator
+			Controlador da navegação da aplicação
+		'''
 		self._window = uic.loadUi('ui/home.ui')
 		self._navigator = navigator
 
@@ -26,9 +47,18 @@ class HomeWindow:
 	
 	@property
 	def window(self):
+		'''Elemento da janela atual
+
+		Returns
+        -------
+		QMainWindow
+			Instância da janela atual.
+		'''
 		return self._window
 	
 	def load_initial_state(self):
+		'''Carrega o estado inicial da aplicação.
+		'''
 		client = bank.get_client()
 		balance = f"R$ {float(client['account']['balance']):.2f}".replace('.', ',')
 
@@ -38,6 +68,8 @@ class HomeWindow:
 		self._load_history_table()
 
 	def _load_events(self):
+		'''Carrega os eventos da aplicação.
+		'''
 		self._withdraw_btn.clicked.connect(self._navigator.go_to_withdraw_window)
 		self._deposit_btn.clicked.connect(self._navigator.go_to_deposit_window)
 		self._transfer_btn.clicked.connect(self._navigator.go_to_transfer_window)
@@ -45,6 +77,8 @@ class HomeWindow:
 		self._logout_btn.clicked.connect(lambda: self._logout())
 
 	def _load_history_table(self):
+		'''Carrega a tabela de histórico de transações bancárias.
+		'''
 		self._clear_history_table()
 		history = bank.get_client_history()
 
@@ -61,12 +95,18 @@ class HomeWindow:
 		self._history_table.resizeRowsToContents()
 	
 	def _clear_history_table(self):
+		'''Limpa a tabela de histórico de transações bancárias.
+		'''
 		self._history_table.setRowCount(0)
 
 	def _logout(self):
+		'''Encerra a sessão do usuário.
+		'''
 		bank.logout_client()
 		self._navigator.go_to_login_window()
 
 	def close(self):
+		'''Fecha a janela atual.
+		'''
 		self._window.close()
 	
